@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rental-configMap
+  namespace: ns-rental
+data:
+  feign.rental.url: http://rental:8080
