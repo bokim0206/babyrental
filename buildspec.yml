@@ -26,7 +26,8 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - mvn package -Dmaven.test.skip=true
+#      - mvn package -Dmaven.test.skip=true
+      - mvn spring-boot:run
       - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$_AWS_REGION.amazonaws.com/$_PROJECT_NAME:latest  .
   post_build:
     commands:
