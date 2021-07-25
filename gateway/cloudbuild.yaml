@@ -1,4 +1,5 @@
 version: 0.2
+
 steps:
   - id: 'build'
     name: 'gcr.io/cloud-builders/mvn'
