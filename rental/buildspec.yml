@@ -19,7 +19,8 @@ phases:
       - echo $_PROJECT_NAME
       - echo $AWS_ACCOUNT_ID
       - echo $AWS_DEFAULT_REGION
-      - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
+#      - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo latest
       - echo start command
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
@@ -27,11 +28,11 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...
       - mvn package -Dmaven.test.skip=true
-      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_PROJECT_NAME:latest  .
+      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest  .
   post_build:
     commands:
       - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$_AWS_REGION.amazonaws.com/$_PROJECT_NAME:latest
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$_AWS_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest
       - echo connect kubectl
       - echo create namespace
       - kubectl config set-cluster k8s --server="$KUBE_URL" --insecure-skip-tls-verify=true
