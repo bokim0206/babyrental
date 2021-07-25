@@ -9,6 +9,7 @@ phases:
     runtime-versions:
       java: corretto8
       docker: 18
+      java: openjdk8
      
   pre_build:
     commands:
@@ -19,16 +20,16 @@ phases:
       - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
       - echo start command
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-  build:
+ build:
+    commands:
+      - mvn test   
+ build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
       - mvn package -Dmaven.test.skip=true
       - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION  .
-  build:
-    commands:
-      - mvn test   
-      
+     
   post_build:
     commands:
       - echo Build completed on `date`
