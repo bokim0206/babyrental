@@ -2,7 +2,10 @@ version: 0.2
  
 env:
   variables:
-    _PROJECT_NAME: "babyrental"
+    _PROJECT_NAME: "rental"
+    _ECR_NAME: "userbk"
+    _NAMESPACE: "userbk-ns" 
+    _AWS_REGION: "us-east-2" 
 
 phases:
   install:
@@ -18,9 +21,10 @@ phases:
     commands:
       - echo Logging in to Amazon ECR...
       - echo $_PROJECT_NAME
+      - echo $_ECR_NAME
       - echo $AWS_ACCOUNT_ID
       - echo $AWS_DEFAULT_REGION
-      - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo latest
       - echo start command
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
@@ -28,11 +32,11 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...
       - mvn package -Dmaven.test.skip=true
-      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_PROJECT_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION  .
+      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest  .
   post_build:
     commands:
       - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_PROJECT_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest
       - echo connect kubectl
       - kubectl config set-cluster k8s --server="$KUBE_URL" --insecure-skip-tls-verify=true
       - kubectl config set-credentials admin --token="$KUBE_TOKEN"
@@ -73,7 +77,7 @@ phases:
               spec:
                 containers:
                   - name: $_PROJECT_NAME
-                    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_PROJECT_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+                    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest
                     ports:
                       - containerPort: 8080
                     readinessProbe:
