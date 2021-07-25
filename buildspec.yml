@@ -3,8 +3,8 @@ version: 0.2
 env:
   variables:
 #    IMAGE_REPO_NAME: "user07-rentals"
-     _PROJECT_NAME: "user07-repo" 
-     _ECR_NAME: "user07-rentals" 
+     _PROJECT_NAME: "user07-rentals" 
+     _ECR_NAME: "user07-repo" 
      _NAMESPACE: "user07-ns"
      _AWS_REGION: "us-east-2"     
 
