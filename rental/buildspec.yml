@@ -2,7 +2,7 @@ version: 0.2
  
 env:
   variables:
-    _PROJECT_NAME: "user07-rental"
+    _PROJECT_NAME: "babyrental"
 
 phases:
   install:
