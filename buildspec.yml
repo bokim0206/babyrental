@@ -42,7 +42,7 @@ phases:
       - |
         cat <<EOF | kubectl apply -f -
         apiVersion: v1
-        kind: Service
+        kind: ServiceAccount
         metadata:
           name: $_PROJECT_NAME
           namespace: $_NAMESPACE
