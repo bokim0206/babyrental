@@ -2,7 +2,11 @@ version: 0.2
 
 env:
   variables:
-    IMAGE_REPO_NAME: "user07-rentals"
+#    IMAGE_REPO_NAME: "user07-rentals"
+     _PROJECT_NAME: "cafemanage" 
+     _ECR_NAME: "user07-rentals" 
+     _NAMESPACE: "user07-ns"
+     _AWS_REGION: "us-east-2"     
 
 phases:
   install:
@@ -12,7 +16,7 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      - echo $IMAGE_REPO_NAME
+      - echo $_PROJECT_NAME
       - echo $AWS_ACCOUNT_ID
       - echo $AWS_DEFAULT_REGION
       - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
@@ -26,10 +30,73 @@ phases:
       - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION  .
   post_build:
     commands:
-      - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
- 
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$_AWS_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest
+      - echo connect kubectl
+      - echo create namespace
+      - kubectl config set-cluster k8s --server="$KUBE_URL" --insecure-skip-tls-verify=true
+      - kubectl config set-credentials admin --token="$KUBE_TOKEN"
+      - kubectl config set-context default --cluster=k8s --user=admin
+      - kubectl config use-context default
+      - kubectl create ns $_NAMESPACE || true
+      - |
+        cat <<EOF | kubectl apply -f -
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: $_PROJECT_NAME
+          namespace: $_NAMESPACE
+          labels:
+            app: $_PROJECT_NAME
+        spec:
+          ports:
+            - port: 8080
+              targetPort: 8080
+          selector:
+            app: $_PROJECT_NAME
+        EOF
+      - |
+        cat  <<EOF | kubectl apply -f -
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: $_PROJECT_NAME
+          namespace: $_NAMESPACE
+          labels:
+            app: $_PROJECT_NAME
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              app: $_PROJECT_NAME
+          template:
+            metadata:
+              labels:
+                app: $_PROJECT_NAME
+            spec:
+              containers:
+                - name: $_PROJECT_NAME
+                  image: $AWS_ACCOUNT_ID.dkr.ecr.$_AWS_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest
+                  ports:
+                    - containerPort: 8080 
+                  imagePullPolicy: Always
+                  readinessProbe:
+                    httpGet:
+                      path: '/actuator/health'
+                      port: 8080
+                    initialDelaySeconds: 30
+                    timeoutSeconds: 2
+                    periodSeconds: 5
+                    failureThreshold: 10
+                  livenessProbe:
+                    httpGet:
+                      path: '/actuator/health'
+                      port: 8080
+                    initialDelaySeconds: 120
+                    timeoutSeconds: 2
+                    periodSeconds: 5
+                    failureThreshold: 5   
+        EOF
 cache:
   paths:
     - '/root/.m2/**/*'
