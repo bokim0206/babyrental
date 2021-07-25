@@ -1,15 +1,14 @@
 version: 0.2
- 
+
 env:
   variables:
-    IMAGE_REPO_NAME: "user07-rentals" 
+    IMAGE_REPO_NAME: "user07-rentals"
 
 phases:
   install:
     runtime-versions:
       java: corretto8
       docker: 18
-     
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
@@ -19,15 +18,12 @@ phases:
       - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
       - echo start command
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
- 
- build:
+  build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - mvn test   
       - mvn package -Dmaven.test.skip=true
       - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION  .
-     
   post_build:
     commands:
       - echo Build completed on `date`
@@ -37,4 +33,3 @@ phases:
 cache:
   paths:
     - '/root/.m2/**/*'
-
