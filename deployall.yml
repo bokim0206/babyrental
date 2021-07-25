@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: reservation
+  name: rental
   labels:
-    app: reservation
+    app: rental
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: reservation
+      app: rental
   template:
     metadata:
       labels:
-        app: reservation
+        app: rental
     spec:
       containers:
-        - name: reservation
-          image: simair/reservation:latest
+        - name: rentals
+          image: user07-rental:latest
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -39,15 +39,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: reservation
+  name: rental
   labels:
-    app: reservation
+    app: rental
 spec:
   ports:
     - port: 8080
       targetPort: 8080
   selector:
-    app: reservation
+    app: rental
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -67,7 +67,7 @@ spec:
     spec:
       containers:
         - name: rental
-          image: bokim0206/rental:latest
+          image: user07-rental/rental:latest
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -118,7 +118,7 @@ spec:
     spec:
       containers:
         - name: mypage
-          image: bokim0206/mypage:latest
+          image: user07-rental/mypage:latest
           ports:
             - containerPort: 8080
           readinessProbe:
@@ -169,7 +169,7 @@ spec:
     spec:
       containers:
         - name: gateway
-          image: bokim0206/gateway:latest
+          image: user07-rental/gateway:latest
           ports:
             - containerPort: 8080
 ---
