@@ -8,10 +8,10 @@
 		<version>2.1.9.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>rentalreservation</groupId>
-	<artifactId>rental</artifactId>
+	<groupId>local</groupId>
+	<artifactId>CafeManage</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>rental</name>
+	<name>CafeManage</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -57,7 +57,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+        </dependency>
+    </dependencies>
 
 	<dependencyManagement>
 		<dependencies>
