@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
 #    IMAGE_REPO_NAME: "user07-rentals"
-     _PROJECT_NAME: "user07-rentals" 
+     _PROJECT_NAME: "rental" 
      _ECR_NAME: "user07-rentals" 
      _NAMESPACE: "user07-ns"
      _AWS_REGION: "us-east-2"     
@@ -26,7 +26,7 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-#      - mvn package -Dmaven.test.skip=true
+      - mvn package -Dmaven.test.skip=true
       - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_PROJECT_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION  .
   post_build:
     commands:
