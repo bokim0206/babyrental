@@ -17,17 +17,17 @@ phases:
       - echo Logging in to Amazon ECR...
       - echo $_PROJECT_NAME
       - echo $AWS_ACCOUNT_ID
-      - echo $AWS_DEFAULT_REGION
+      - echo $AWS_REGION
 #      - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
       - echo latest
       - echo start command
-      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+      - $(aws ecr get-login --no-include-email --region $AWS_REGION)
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
       - mvn package -Dmaven.test.skip=true
-      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_PROJECT_NAME:latest  .
+      - docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$_PROJECT_NAME:latest  .
   post_build:
     commands:
       - echo Pushing the Docker image...
@@ -76,7 +76,7 @@ phases:
             spec:
               containers:
                 - name: $_PROJECT_NAME
-                  image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$_PROJECT_NAME:latest
+                  image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$_PROJECT_NAME:latest
                   ports:
                     - containerPort: 8080 
                   imagePullPolicy: Always
