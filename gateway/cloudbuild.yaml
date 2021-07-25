@@ -1,3 +1,4 @@
+version: 0.2
 steps:
   - id: 'build'
     name: 'gcr.io/cloud-builders/mvn'
@@ -81,5 +82,5 @@ substitutions:
 options:
   env:
     #    # location/name of GKE cluster (used by all kubectl commands)
-    - CLOUDSDK_COMPUTE_ZONE=asia-northeast1-a
-    - CLOUDSDK_CONTAINER_CLUSTER=standard-cluster-1
+    - CLOUDSDK_COMPUTE_ZONE=us-east-2
+    - CLOUDSDK_CONTAINER_CLUSTER=userbk-eks
