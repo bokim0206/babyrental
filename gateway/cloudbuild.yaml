@@ -10,33 +10,33 @@ steps:
     ]
   ### Build
   - id: 'docker build'
-    name: 'gcr.io/cloud-builders/docker'
+#    name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         echo '$COMMIT_SHA =' $COMMIT_SHA
-        docker build -t gcr.io/$PROJECT_ID/$_PROJECT_NAME:$COMMIT_SHA .
+        docker build -t $AWS_ACCOUNT_ID.dkr.ecr.$_AWS_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest  .
   ### Test
   ### Publish
   - id: 'publish'
-    name: 'gcr.io/cloud-builders/docker'
+#    name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        docker push gcr.io/$PROJECT_ID/$_PROJECT_NAME:$COMMIT_SHA
+        docker push $AWS_ACCOUNT_ID.dkr.ecr.$_AWS_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest  
   ### deploy
   - id: 'deploy'
-    name: 'gcr.io/cloud-builders/gcloud'
+#    name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        PROJECT=$$(gcloud config get-value core/project)
-        gcloud container clusters get-credentials "$${CLOUDSDK_CONTAINER_CLUSTER}" \
-          --project "$${PROJECT}" \
-          --zone "$${CLOUDSDK_COMPUTE_ZONE}"
+ #       PROJECT=$$(gcloud config get-value core/project)
+ #       gcloud container clusters get-credentials "$${CLOUDSDK_CONTAINER_CLUSTER}" \
+ #         --project "$${PROJECT}" \
+ #         --zone "$${CLOUDSDK_COMPUTE_ZONE}"
 
         cat <<EOF | kubectl apply -f -
         apiVersion: v1
@@ -74,12 +74,16 @@ steps:
             spec:
               containers:
                 - name: $_PROJECT_NAME
-                  image: gcr.io/$PROJECT_ID/$_PROJECT_NAME:$COMMIT_SHA
+#                  image: gcr.io/$PROJECT_ID/$_PROJECT_NAME:$COMMIT_SHA
+                  image: $AWS_ACCOUNT_ID.dkr.ecr.$_AWS_REGION.amazonaws.com/$_ECR_NAME-$_PROJECT_NAME:latest
                   ports:
                     - containerPort: 8080
         EOF
 substitutions:
     _PROJECT_NAME: gateway
+    _ECR_NAME: "user06"
+    _NAMESPACE: "user06-ns"
+    _AWS_REGION: "ap-northeast-1"
 options:
   env:
     #    # location/name of GKE cluster (used by all kubectl commands)
