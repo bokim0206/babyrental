@@ -103,3 +103,4 @@ options:
     #    # location/name of GKE cluster (used by all kubectl commands)
     - CLOUDSDK_COMPUTE_ZONE=ap-northeast-1
     - CLOUDSDK_CONTAINER_CLUSTER=user06-eks
+ 
